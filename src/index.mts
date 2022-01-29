@@ -7,10 +7,8 @@ import { getTikTokVideoURLByLink, isTikTokLink } from './tiktok.mjs'
 import { getTrillerVideoByLink, isTrillerLink } from './triller.mjs'
 import { MessageContext } from './types.mjs'
 
-console.log(process.env)
-
-const TELEGRAM_BOT_USERNAME = 'SosaDowloaderBot'
-const TELEGRAM_BOT_API_TOKEN = '5192469864:AAGOxMilPDoIocUfuf1cwRrv9H4lk3RFD3g'
+const TELEGRAM_BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME
+const TELEGRAM_BOT_API_TOKEN = process.env.TELEGRAM_BOT_API_TOKEN
 
 const CAPTION = `Скачано при помощи @${TELEGRAM_BOT_USERNAME}`
 
@@ -19,7 +17,7 @@ const START_SENDING_MESSAGE = 'Принял. Отправляю 🚀'
 const HELLO_MESSAGE =
   `Привет👋` +
   `\n\nС моей помощью ты можешь получить любое видео из Triller / TikTok / Instagram без логотипов в самом лучшем качестве 😊` +
-  `\n\nЧтобы воспользоваться ботом, подпишись на меня в instagram и отправь мне свой instagram для проверки 🙏` +
+  `\n\nЧтобы воспользоваться ботом, подпишись на меня в instagram и отправь мне свой instagram для проверки подписки 🙏` +
   `\nТем самым, ты поддержишь разработчика, который не спал ночь, чтобы создать меня 🐼`
 
 const TO_USE_BOT_MESSAGE =
@@ -27,11 +25,10 @@ const TO_USE_BOT_MESSAGE =
 
 const bot = new Telegraf(TELEGRAM_BOT_API_TOKEN)
 
-bot.command('start', (ctx) => {
-  ctx
-    .reply(HELLO_MESSAGE)
-    .catch(() => null)
-})
+const replyWithFollowButton = (ctx: MessageContext, message: string) =>
+  ctx.reply(message, {
+    reply_markup: { inline_keyboard: [[{ text: 'Подписаться', url: 'https://instagram.com/_thecursedsoul' }]] },
+  })
 
 const sendMedia = async (ctx: MessageContext, media: string[]) => {
   console.log('sendMedia', media)
@@ -100,13 +97,13 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
   const instagramUsername = getInstagramUsername(text)
 
   if (!instagramUsername) {
-    return ctx.reply(TO_USE_BOT_MESSAGE).catch(null)
+    return replyWithFollowButton(ctx, TO_USE_BOT_MESSAGE).catch(null)
   }
 
   const following = await checkFollowing(instagramUsername)
 
   if (!following) {
-    return ctx.reply(`⚠️ Подписка не найдена. ${TO_USE_BOT_MESSAGE}`, {}).catch(null)
+    return replyWithFollowButton(ctx, `⚠️ Подписка не найдена. ${TO_USE_BOT_MESSAGE}`).catch(null)
   }
 
   await saveUser({ id: tgUser.id, username: tgUser.username, instagram: instagramUsername })
@@ -133,6 +130,10 @@ const downloaderFlow = (ctx: MessageContext) => {
     return processInstagramLink(ctx, text)
   }
 }
+
+bot.command('start', (ctx) => {
+  replyWithFollowButton(ctx, HELLO_MESSAGE).catch(() => null)
+})
 
 bot.on('text', async (ctx) => {
   try {
