@@ -1,0 +1,20 @@
+diff --git a/node_modules/@phaticusthiccy/open-apis/InstaDownloader/start/instagram_post.js b/node_modules/@phaticusthiccy/open-apis/InstaDownloader/start/instagram_post.js
+index 479c210..b6df75a 100644
+--- a/node_modules/@phaticusthiccy/open-apis/InstaDownloader/start/instagram_post.js
++++ b/node_modules/@phaticusthiccy/open-apis/InstaDownloader/start/instagram_post.js
+@@ -16,6 +16,7 @@ async function insta_post(url) {
+         if_one_post = false
+     }
+     if (!if_one_post) {
++        return data.map((d) => d.url[0]);
+         if (data.length == 1) {
+             payload.post1 = {}
+             payload.title = data.meta.title
+@@ -333,6 +334,7 @@ async function insta_post(url) {
+             delete payload.post11
+         }
+     } else {
++        return [data.url[0]]
+         payload.post1 = {}
+         payload.title = data.meta.title
+         payload.expires = "15 Minute"
