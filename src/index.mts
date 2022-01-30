@@ -147,10 +147,11 @@ bot.on('text', async (ctx) => {
     const alreadyFollowed = await checkAlreadyFollowed(userId)
 
     if (!alreadyFollowed) {
-      return unauthorizedFlow(ctx)
+      await unauthorizedFlow(ctx)
+      return
     }
 
-    downloaderFlow(ctx)
+    await downloaderFlow(ctx)
   } catch (e) {
     console.log(e)
     ctx.reply('Что то пошло не так... Попробуй еще раз')
