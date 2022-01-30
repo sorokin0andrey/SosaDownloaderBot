@@ -1,5 +1,6 @@
 import { Telegraf } from 'telegraf'
 import { ExtraVideo } from 'telegraf/typings/telegram-types'
+import filenamify from 'filenamify'
 import { checkAlreadyFollowed, checkFollowing, checkStolenInstagram, getInstagramUsername } from './auth.mjs'
 import { initDB, saveUser } from './db.mjs'
 import { getInstagramMediaByLink, isInstagramLink } from './instagram.mjs'
@@ -98,7 +99,9 @@ const processYoutubeLink = async (ctx: MessageContext, link: string) => {
 
   const audio = await getYoutubeAudio(link, onProgress)
 
-  await ctx.replyWithAudio({ source: audio.buffer, filename: `${audio.info.videoDetails.title}` })
+  const filename = filenamify(audio.info.videoDetails.title)
+
+  await ctx.replyWithAudio({ source: audio.buffer, filename })
 }
 
 const unauthorizedFlow = async (ctx: MessageContext) => {
