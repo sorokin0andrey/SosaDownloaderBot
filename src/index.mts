@@ -116,23 +116,23 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
 const downloaderFlow = async (ctx: MessageContext) => {
   const text = ctx.message.text
 
-  if (isYoutubeLink(text)) {
-    try {
-      const msg = await ctx.reply('Выполняю... ')
+  // if (isYoutubeLink(text)) {
+  //   try {
+  //     const msg = await ctx.reply('Выполняю... ')
 
-      const onProgress = (progress: number) => {
-        ctx.telegram.editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`).catch()
-      }
+  //     const onProgress = (progress: number) => {
+  //       ctx.telegram.editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`).catch()
+  //     }
 
-      const audio = await getYoutubeAudio(text, onProgress)
+  //     const audio = await getYoutubeAudio(text, onProgress)
 
-      await ctx.replyWithAudio({ source: audio.buffer, filename: `${audio.info.videoDetails.title}` })
-    } catch (e) {
-      console.log(e)
-    }
+  //     await ctx.replyWithAudio({ source: audio.buffer, filename: `${audio.info.videoDetails.title}` })
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
 
-    return
-  }
+  //   return
+  // }
 
   if (isTrillerLink(text)) {
     return processTrillerLink(ctx, text)
