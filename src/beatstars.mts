@@ -43,7 +43,7 @@ const getBeatstarsInfo = async (id: string) => {
   const bpm = data?.response?.data?.details?.bpm as string
   const duration = data?.response?.data?.details?.duration as string
 
-  if (!streamUrl || !title || !bpm || !duration) {
+  if (!streamUrl || !title || !duration) {
     throw new Error('unvalid url')
   }
 
@@ -67,7 +67,7 @@ export const getBeatstarsAudio = async (link: string, onProgress: (progress: num
 
   const { streamUrl, title, duration, bpm } = info
 
-  const titleWithBPM = `${bpm} BPM ${title}`
+  const titleWithBPM = bpm.length > 0 ? `${bpm} BPM ${title}` : title
 
   const format = 'mp3'
 
