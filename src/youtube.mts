@@ -28,28 +28,21 @@ export const getYoutubeAudio = async (link: string, onProgress: (progress: numbe
 
   const stream = ytdl.downloadFromInfo({ ...info, formats: [format] })
 
-  const command = ffmpeg(stream)
-    .audioBitrate(320)
-    .toFormat('mp3')
-    .on('progress', (progress) => onProgress(timemarkToSeconds(progress.timemark) / totalDuration))
-    .on('stderr', function(stderrLine) {
-      console.log('Stderr output: ' + stderrLine);
-    })
-    .on('error', function(err, stdout, stderr) {
-      console.log('Cannot process video: ' + err.message);
-    })
+  const buffer = await new Promise<Buffer>((resolve, reject) => {
+    const _buf: Uint8Array[] = []
 
-  const ffstream = command.pipe()
-
-  const buffer = await new Promise<Buffer>((resolve) => {
-    let _buf: Uint8Array[] = []
-
-    ffstream.on('data', (chunk) => _buf.push(chunk))
-
-    ffstream.on('end', () => resolve(Buffer.concat(_buf)))
+    ffmpeg(stream)
+      .audioBitrate(320)
+      .toFormat('mp3')
+      .on('progress', (progress) => onProgress(timemarkToSeconds(progress.timemark) / totalDuration))
+      .on('error', (err) => reject(err))
+      .pipe()
+      .on('data', (chunk) => _buf.push(chunk))
+      .on('end', () => resolve(Buffer.concat(_buf)))
+      .on('error', (err) => reject(err))
   })
 
   return { info, buffer }
 }
 
-export const isYoutubeLink = (link: string) => ytdl.validateURL(link);
+export const isYoutubeLink = (link: string) => ytdl.validateURL(link)
