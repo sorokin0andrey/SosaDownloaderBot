@@ -22,14 +22,14 @@ export const getYoutubeAudio = async (link: string, onProgress: (progress: numbe
 
   const totalDuration = Number(info.videoDetails.lengthSeconds)
 
-  const audioFormats = ytdl.filterFormats(info.formats, 'audioonly')
+  // const audioFormats = ytdl.filterFormats(info.formats, 'audioonly')
 
-  const format = ytdl.chooseFormat(audioFormats, { quality: 'highestaudio' })
+  const format = ytdl.chooseFormat(info.formats, { quality: 'highest' })
 
   const buffer = await new Promise<Buffer>((resolve, reject) => {
     const _buf: Uint8Array[] = []
 
-    const timeoutId = setTimeout(reject, 40000)
+    const timeoutId = setTimeout(() => reject(), 40000)
 
     ffmpeg(format.url)
       .audioBitrate(320)
