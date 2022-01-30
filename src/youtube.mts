@@ -26,20 +26,29 @@ export const getYoutubeAudio = async (link: string, onProgress: (progress: numbe
 
   const format = ytdl.chooseFormat(audioFormats, { quality: 'highestaudio' })
 
-  const stream = ytdl.downloadFromInfo({ ...info, formats: [format] })
-
   const buffer = await new Promise<Buffer>((resolve, reject) => {
     const _buf: Uint8Array[] = []
 
-    ffmpeg(stream)
+    const timeoutId = setTimeout(reject, 40000)
+
+    ffmpeg(format.url)
       .audioBitrate(320)
       .toFormat('mp3')
       .on('progress', (progress) => onProgress(timemarkToSeconds(progress.timemark) / totalDuration))
       .on('error', (err) => reject(err))
+      .on('stderr', (stderrLine) => {
+        console.log('Stderr output: ' + stderrLine)
+      })
       .pipe()
       .on('data', (chunk) => _buf.push(chunk))
-      .on('end', () => resolve(Buffer.concat(_buf)))
-      .on('error', (err) => reject(err))
+      .on('end', () => {
+        clearTimeout(timeoutId)
+        resolve(Buffer.concat(_buf))
+      })
+      .on('error', (err) => {
+        clearTimeout(timeoutId)
+        reject(err)
+      })
   })
 
   return { info, buffer }
