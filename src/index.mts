@@ -87,6 +87,20 @@ const processInstagramLink = async (ctx: MessageContext, link: string) => {
   await sendMedia(ctx, media)
 }
 
+const processYoutubeLink = async (ctx: MessageContext, link: string) => {
+  const msg = await ctx.reply('Выполняю...')
+
+  const onProgress = (progress: number) => {
+    ctx.telegram
+      .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю...\n\n${Math.round(progress * 100)}%`)
+      .catch()
+  }
+
+  const audio = await getYoutubeAudio(link, onProgress)
+
+  await ctx.replyWithAudio({ source: audio.buffer, filename: `${audio.info.videoDetails.title}` })
+}
+
 const unauthorizedFlow = async (ctx: MessageContext) => {
   const tgUser = ctx.from
   const text = ctx.message.text
@@ -114,23 +128,11 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
   ctx.reply('Отлично! Спасибо за подписку ❤️' + HOW_TO_USE_MESSAGE).catch(null)
 }
 
-const downloaderFlow = async (ctx: MessageContext) => {
+const downloaderFlow = (ctx: MessageContext) => {
   const text = ctx.message.text
 
   if (isYoutubeLink(text)) {
-    const msg = await ctx.reply('Выполняю... ')
-
-    const onProgress = (progress: number) => {
-      ctx.telegram
-        .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`)
-        .catch()
-    }
-
-    const audio = await getYoutubeAudio(text, onProgress)
-
-    await ctx.replyWithAudio({ source: audio.buffer, filename: `${audio.info.videoDetails.title}` })
-
-    return
+    return processYoutubeLink(ctx, text)
   }
 
   if (isTrillerLink(text)) {
