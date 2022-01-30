@@ -1,31 +1,22 @@
 import { Telegraf } from 'telegraf'
 import { ExtraVideo } from 'telegraf/typings/telegram-types'
-import { checkAlreadyFollowed, checkFollowing, getInstagramUsername } from './auth.mjs'
+import { checkAlreadyFollowed, checkFollowing, checkStolenInstagram, getInstagramUsername } from './auth.mjs'
 import { initDB, saveUser } from './db.mjs'
 import { getInstagramMediaByLink, isInstagramLink } from './instagram.mjs'
+import {
+  START_SENDING_MESSAGE,
+  CAPTION,
+  HOW_TO_AUTH_MESSAGE,
+  HOW_TO_USE_MESSAGE,
+  HELLO_MESSAGE,
+  HELLO_INSTRUCTION_MESSAGE,
+  STOLEN_MESSAGE,
+} from './phrases.mjs'
 import { getTikTokVideoURLByLink, isTikTokLink } from './tiktok.mjs'
 import { getTrillerVideoByLink, isTrillerLink } from './triller.mjs'
 import { MessageContext } from './types.mjs'
 
-const TELEGRAM_BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME
 const TELEGRAM_BOT_API_TOKEN = process.env.TELEGRAM_BOT_API_TOKEN
-
-const CAPTION = `Скачано при помощи @${TELEGRAM_BOT_USERNAME}`
-
-const START_SENDING_MESSAGE = 'Принял. Отправляю 🚀'
-
-const HELLO_MESSAGE =
-  `Привет👋` +
-  `\n\nС моей помощью ты можешь получить любое видео из Triller / TikTok / Instagram без логотипов в самом лучшем качестве 😊`
-
-const HELLO_INSTRUCTION_MESSAGE =
-  `\n\nЧтобы воспользоваться ботом, подпишись на меня в instagram и отправь мне свой instagram для проверки подписки 🙏` +
-  `\nТем самым, ты поддержишь разработчика, который не спал ночь, чтобы создать меня 🐼`
-
-const HOW_TO_AUTH_MESSAGE =
-  'Чтобы воспользоваться ботом, подпишись на меня в instagram и отправь мне свой instagram для проверки 🙏'
-
-const HOW_TO_USE_MESSAGE = `\n\nОтправь мне ссылку на видео, а я тебе в ответ видео без логотипов в наилучшем качестве 😉`
 
 const bot = new Telegraf(TELEGRAM_BOT_API_TOKEN)
 
@@ -104,6 +95,12 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
     return replyWithFollowButton(ctx, HOW_TO_AUTH_MESSAGE).catch(null)
   }
 
+  const stolen = checkStolenInstagram(tgUser.id, instagramUsername)
+
+  if (stolen) {
+    return ctx.reply(STOLEN_MESSAGE).catch(() => null)
+  }
+
   const following = await checkFollowing(instagramUsername)
 
   if (!following) {
@@ -112,11 +109,7 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
 
   await saveUser({ id: tgUser.id, username: tgUser.username, instagram: instagramUsername })
 
-  ctx
-    .reply(
-      'Отлично! Спасибо за подписку ❤️' + HOW_TO_USE_MESSAGE
-    )
-    .catch(null)
+  ctx.reply('Отлично! Спасибо за подписку ❤️' + HOW_TO_USE_MESSAGE).catch(null)
 }
 
 const downloaderFlow = (ctx: MessageContext) => {

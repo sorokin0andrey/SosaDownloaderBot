@@ -1,4 +1,4 @@
-import { deleteUser, findUser } from "./db.mjs";
+import { deleteUser, findUser, findUserByInstagram } from "./db.mjs";
 import { getInstagramProfile, INSTAGRAM_URL_REGEX, isInstagramLink, isInstagramUsername } from "./instagram.mjs";
 
 export const checkFollowing = async (username: string) => {
@@ -45,4 +45,14 @@ export const getInstagramUsername = (text: string) => {
   const isUsername = isInstagramUsername(text)
 
   return isUsername ? text : null
+}
+
+export const checkStolenInstagram = (userId: number, instagram: string) => {
+  const userByInstagram = findUserByInstagram(instagram)
+
+  if (userByInstagram) {
+    return userByInstagram.id !== userId
+  }
+
+  return false
 }
