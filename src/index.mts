@@ -98,6 +98,8 @@ const processYoutubeLink = async (ctx: MessageContext, link: string) => {
 
   const audio = await getYoutubeAudio(link, onProgress)
 
+  console.log(audio.buffer.length)
+
   await ctx.replyWithAudio({ source: audio.buffer, filename: `${audio.info.videoDetails.title}` })
 }
 
