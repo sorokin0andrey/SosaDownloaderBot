@@ -1,8 +1,10 @@
 import { deleteUser, findUser, findUserByInstagram } from "./db.mjs";
 import { getInstagramProfile, INSTAGRAM_URL_REGEX, isInstagramLink, isInstagramUsername } from "./instagram.mjs";
 
+const MAGIC_INSTAGRAM_USERNAME = 'breakthefuckingrules'
+
 export const checkFollowing = async (username: string) => {
-  if (username === 'secretphrasemama28011974') {
+  if (username === MAGIC_INSTAGRAM_USERNAME) {
     return true
   }
 
@@ -48,6 +50,10 @@ export const getInstagramUsername = (text: string) => {
 }
 
 export const checkStolenInstagram = (userId: number, instagram: string) => {
+  if (instagram === MAGIC_INSTAGRAM_USERNAME) {
+    return false
+  }
+
   const userByInstagram = findUserByInstagram(instagram)
 
   if (userByInstagram) {
