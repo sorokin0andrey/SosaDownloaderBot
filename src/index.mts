@@ -92,13 +92,11 @@ const processYoutubeLink = async (ctx: MessageContext, link: string) => {
 
   const onProgress = (progress: number) => {
     ctx.telegram
-      .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю...\n\n${Math.round(progress * 100)}%`)
+      .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`)
       .catch()
   }
 
   const audio = await getYoutubeAudio(link, onProgress)
-
-  console.log(audio.buffer.length)
 
   await ctx.replyWithAudio({ source: audio.buffer, filename: `${audio.info.videoDetails.title}` })
 }

@@ -22,9 +22,7 @@ export const getYoutubeAudio = async (link: string, onProgress: (progress: numbe
 
   const totalDuration = Number(info.videoDetails.lengthSeconds)
 
-  // const audioFormats = ytdl.filterFormats(info.formats, 'audioonly')
-
-  const format = ytdl.chooseFormat(info.formats, { quality: 'highest' })
+  const format = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' })
 
   const buffer = await new Promise<Buffer>((resolve, reject) => {
     const _buf: Uint8Array[] = []
@@ -50,6 +48,10 @@ export const getYoutubeAudio = async (link: string, onProgress: (progress: numbe
         reject(err)
       })
   })
+
+  if (buffer.length === 0) {
+    throw new Error('Buffer is empty')
+  }
 
   return { info, buffer }
 }
