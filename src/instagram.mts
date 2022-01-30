@@ -2,7 +2,7 @@
 import { insta_post } from '@phaticusthiccy/open-apis'
 import fetch from 'node-fetch'
 
-export const INSTAGRAM_URL_REGEX = /instagram.com\/([^/]+)/
+export const INSTAGRAM_URL_REGEX = /instagram.com\/([^/?]+)/
 
 export const INSTAGRAM_USERNAME_REGEX = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/
 

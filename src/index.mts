@@ -1,7 +1,7 @@
 import { Telegraf } from 'telegraf'
 import { ExtraVideo } from 'telegraf/typings/telegram-types'
-import filenamify from 'filenamify'
 import { checkAlreadyFollowed, checkFollowing, checkStolenInstagram, getInstagramUsername } from './auth.mjs'
+import { getBeatstarsAudio, isBeatstarsLink } from './beatstars.mjs'
 import { initDB, saveUser } from './db.mjs'
 import { getInstagramMediaByLink, isInstagramLink } from './instagram.mjs'
 import {
@@ -94,14 +94,26 @@ const processYoutubeLink = async (ctx: MessageContext, link: string) => {
   const onProgress = (progress: number) => {
     ctx.telegram
       .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`)
-      .catch()
+      .catch(() => null)
   }
 
-  const audio = await getYoutubeAudio(link, onProgress)
+  const { buffer, filename, duration } = await getYoutubeAudio(link, onProgress)
 
-  const filename = filenamify(audio.info.videoDetails.title)
+  await ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: CAPTION })
+}
 
-  await ctx.replyWithAudio({ source: audio.buffer, filename })
+const processBeatstarsLink = async (ctx: MessageContext, link: string) => {
+  const msg = await ctx.reply('Выполняю...')
+
+  const onProgress = (progress: number) => {
+    ctx.telegram
+      .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`)
+      .catch(() => null)
+  }
+
+  const { buffer, filename, duration } = await getBeatstarsAudio(link, onProgress)
+
+  await ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: CAPTION })
 }
 
 const unauthorizedFlow = async (ctx: MessageContext) => {
@@ -133,6 +145,10 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
 
 const downloaderFlow = (ctx: MessageContext) => {
   const text = ctx.message.text
+
+  if (isBeatstarsLink(text)) {
+    return processBeatstarsLink(ctx, text)
+  }
 
   if (isYoutubeLink(text)) {
     return processYoutubeLink(ctx, text)

@@ -1,59 +1,22 @@
 import ytdl from 'ytdl-core'
-import ffmpeg from 'fluent-ffmpeg'
-
-const timemarkToSeconds = (timemark: string) => {
-  const match = timemark.match(/(.*):(.*):(.*)/)
-
-  if (!match) {
-    return 0
-  }
-
-  const [hours, minutes, seconds] = [match[1], match[2], match[3]].map(Number)
-
-  const sum = hours * 3600 + minutes * 60 + seconds
-
-  return Math.ceil(sum)
-}
+import { getAudio } from './ffmpeg.mjs'
 
 export const getYoutubeAudio = async (link: string, onProgress: (progress: number) => void) => {
   const id = ytdl.getVideoID(link)
 
   const info = await ytdl.getInfo(id)
 
-  const totalDuration = Number(info.videoDetails.lengthSeconds)
+  const title = info.videoDetails.title
 
-  const format = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' })
+  const duration = Number(info.videoDetails.lengthSeconds)
 
-  const buffer = await new Promise<Buffer>((resolve, reject) => {
-    const _buf: Uint8Array[] = []
+  const format = 'mp3'
 
-    const timeoutId = setTimeout(() => reject(), 40000)
+  const { url } = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' })
 
-    ffmpeg(format.url)
-      .audioBitrate(320)
-      .toFormat('mp3')
-      .on('progress', (progress) => onProgress(timemarkToSeconds(progress.timemark) / totalDuration))
-      .on('error', (err) => reject(err))
-      .on('stderr', (stderrLine) => {
-        console.log('Stderr output: ' + stderrLine)
-      })
-      .pipe()
-      .on('data', (chunk) => _buf.push(chunk))
-      .on('end', () => {
-        clearTimeout(timeoutId)
-        resolve(Buffer.concat(_buf))
-      })
-      .on('error', (err) => {
-        clearTimeout(timeoutId)
-        reject(err)
-      })
-  })
+  const { buffer, filename } = await getAudio({ source: url, title, format, duration, onProgress })
 
-  if (buffer.length === 0) {
-    throw new Error('Buffer is empty')
-  }
-
-  return { info, buffer }
+  return { info, buffer, filename, duration }
 }
 
 export const isYoutubeLink = (link: string) => ytdl.validateURL(link)
