@@ -32,6 +32,12 @@ export const getYoutubeAudio = async (link: string, onProgress: (progress: numbe
     .audioBitrate(320)
     .toFormat('mp3')
     .on('progress', (progress) => onProgress(timemarkToSeconds(progress.timemark) / totalDuration))
+    .on('stderr', function(stderrLine) {
+      console.log('Stderr output: ' + stderrLine);
+    })
+    .on('error', function(err, stdout, stderr) {
+      console.log('Cannot process video: ' + err.message);
+    })
 
   const ffstream = command.pipe()
 
