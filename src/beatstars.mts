@@ -1,4 +1,6 @@
 import fetch from 'node-fetch'
+import ytdl from 'ytdl-core'
+import ytsr from 'ytsr'
 import { getAudio } from './ffmpeg.mjs'
 
 const BEATSTARS_REGEX = /beatstars.com\/(.+)-([^/?]+)/
@@ -12,7 +14,9 @@ const getFixedDuration = (input: string) => {
 
   const [minutes, seconds] = [match[1], match[2]].map(Number)
 
-  return minutes * 60 + seconds
+  const sum = minutes * 60 + seconds
+
+  return Number.isInteger(sum) ? sum : 0
 }
 
 const getBeatstarsInfo = async (id: string) => {
@@ -40,7 +44,7 @@ const getBeatstarsInfo = async (id: string) => {
 
   const streamUrl = data?.response?.data?.details?.stream_hls_url as string
   const title = data?.response?.data?.details?.title as string
-  const bpm = data?.response?.data?.details?.bpm as string
+  const bpm = data?.response?.data?.details?.bpm as number
   const duration = data?.response?.data?.details?.duration as string
 
   if (!streamUrl || !title || !duration) {
@@ -48,6 +52,36 @@ const getBeatstarsInfo = async (id: string) => {
   }
 
   return { streamUrl, title, bpm, duration: getFixedDuration(duration) }
+}
+
+const tryFindOnYouTube = async (title: string, duration: number) => {
+  try {
+    const results = await ytsr(title, { pages: 1 })
+
+    const item = results.items[0]
+
+    if (item.type !== 'video' || !item.duration) {
+      return null
+    }
+
+    const itemDuration = getFixedDuration(item.duration)
+
+    const diff = Math.abs(duration - itemDuration)
+
+    console.log('duration', duration, itemDuration, diff)
+
+    if (diff > 1) {
+      return null
+    }
+
+    const info = await ytdl.getInfo(item.id)
+
+    const { url } = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' })
+
+    return { url, duration: itemDuration }
+  } catch {}
+
+  return null
 }
 
 export const getBeatstarsId = (link: string) => {
@@ -65,13 +99,17 @@ export const getBeatstarsAudio = async (link: string, onProgress: (progress: num
 
   const info = await getBeatstarsInfo(id)
 
-  const { streamUrl, title, duration, bpm } = info
+  //const youtube = await tryFindOnYouTube(info.title, info.duration)
 
-  const titleWithBPM = bpm.length > 0 ? `${bpm} BPM ${title}` : title
+  const title = info.bpm ? `${info.bpm} BPM ${info.title}` : info.title
 
   const format = 'mp3'
 
-  const { buffer, filename } = await getAudio({ source: streamUrl, title: titleWithBPM, format, duration, onProgress })
+  const source = info.streamUrl
+
+  const duration = info.duration
+
+  const { buffer, filename } = await getAudio({ source, title, format, duration, onProgress })
 
   return { info, buffer, filename, duration }
 }
