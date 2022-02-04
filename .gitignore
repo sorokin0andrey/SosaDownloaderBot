@@ -25,3 +25,5 @@ yarn-error.log*
 /.idea
 
 db.json
+
+/promote.*

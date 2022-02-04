@@ -46,8 +46,13 @@ export const deleteUser = async (userId: number) => {
   await db.write()
 }
 
-export const findUserByInstagram = (instagram: string): IUser | null => {
+export const getUsers = () => {
   const users = db.data?.users || {}
+  
+  return Object.values(users)
+}
 
-  return Object.values(users).find((user) => user.instagram === instagram) || null
+export const findUserByInstagram = (instagram: string): IUser | null => {
+
+  return getUsers().find((user) => user.instagram === instagram) || null
 }

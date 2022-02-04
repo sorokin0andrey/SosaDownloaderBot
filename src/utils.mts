@@ -5,3 +5,5 @@ export const getProgressBar = (progress: number, length = 20) => {
 
     return items.join('')
 }
+
+export const noop = () => null

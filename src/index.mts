@@ -1,8 +1,10 @@
-import { Telegraf } from 'telegraf'
+import { getPreview, Preview } from 'spotify-url-info'
+import { Markup, Telegraf } from 'telegraf'
 import { ExtraVideo } from 'telegraf/typings/telegram-types'
 import { checkAlreadyFollowed, checkFollowing, checkStolenInstagram, getInstagramUsername } from './auth.mjs'
 import { getBeatstarsAudio, isBeatstarsLink } from './beatstars.mjs'
-import { initDB, saveUser } from './db.mjs'
+import { getUsers, initDB, IUser, saveUser } from './db.mjs'
+import { IPromoteVideo, makePromoteVideo } from './ffmpeg.mjs'
 import { getInstagramMediaByLink, isInstagramLink } from './instagram.mjs'
 import {
   START_SENDING_MESSAGE,
@@ -17,21 +19,21 @@ import {
 import { getTikTokVideoURLByLink, isTikTokLink } from './tiktok.mjs'
 import { getTrillerVideoByLink, isTrillerLink } from './triller.mjs'
 import { MessageContext } from './types.mjs'
+import { noop } from './utils.mjs'
 import { getYoutubeAudio, isYoutubeLink } from './youtube.mjs'
 
 const TELEGRAM_BOT_API_TOKEN = process.env.TELEGRAM_BOT_API_TOKEN
+const TELEGRAM_BOT_ADMIN_ID = Number(process.env.TELEGRAM_BOT_ADMIN_ID)
 
 const bot = new Telegraf(TELEGRAM_BOT_API_TOKEN)
 
 const replyWithFollowButton = (ctx: MessageContext, message: string) =>
-  ctx.reply(message, {
-    reply_markup: { inline_keyboard: [[{ text: 'Подписаться', url: 'https://instagram.com/_thecursedsoul' }]] },
-  })
+  ctx.reply(message, Markup.inlineKeyboard([Markup.button.url('Подписаться', 'https://instagram.com/_thecursedsoul')]))
 
 const sendMedia = async (ctx: MessageContext, media: string[]) => {
   console.log('sendMedia', media)
 
-  ctx.reply(START_SENDING_MESSAGE).catch(() => null)
+  ctx.reply(START_SENDING_MESSAGE).catch(noop)
 
   for (const url of media) {
     ctx.replyWithChatAction('upload_document')
@@ -47,9 +49,9 @@ const sendMedia = async (ctx: MessageContext, media: string[]) => {
 const sendVideo = async (ctx: MessageContext, videoURL: string, extras?: ExtraVideo) => {
   console.log('sendVideo', videoURL, extras)
 
-  ctx.reply(START_SENDING_MESSAGE).catch(() => null)
+  ctx.reply(START_SENDING_MESSAGE).catch(noop)
 
-  ctx.replyWithChatAction('upload_video').catch(() => null)
+  ctx.replyWithChatAction('upload_video').catch(noop)
 
   if (extras) {
     try {
@@ -94,7 +96,7 @@ const processYoutubeLink = async (ctx: MessageContext, link: string) => {
   const onProgress = (progress: number) => {
     ctx.telegram
       .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`)
-      .catch(() => null)
+      .catch(noop)
   }
 
   const { buffer, filename, duration } = await getYoutubeAudio(link, onProgress)
@@ -108,7 +110,7 @@ const processBeatstarsLink = async (ctx: MessageContext, link: string) => {
   const onProgress = (progress: number) => {
     ctx.telegram
       .editMessageText(ctx.message.chat.id, msg.message_id, undefined, `Выполняю... ${Math.round(progress * 100)}%`)
-      .catch(() => null)
+      .catch(noop)
   }
 
   const { buffer, filename, duration } = await getBeatstarsAudio(link, onProgress)
@@ -129,7 +131,7 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
   const stolen = checkStolenInstagram(tgUser.id, instagramUsername)
 
   if (stolen) {
-    return ctx.reply(STOLEN_MESSAGE).catch(() => null)
+    return ctx.reply(STOLEN_MESSAGE).catch(noop)
   }
 
   const following = await checkFollowing(instagramUsername)
@@ -174,19 +176,65 @@ bot.command('start', async (ctx) => {
     const alreadyFollowed = await checkAlreadyFollowed(ctx.message.from.id)
 
     if (alreadyFollowed) {
-      return ctx.reply(HELLO_MESSAGE + HOW_TO_USE_MESSAGE).catch(() => null)
+      return ctx.reply(HELLO_MESSAGE + HOW_TO_USE_MESSAGE).catch(noop)
     }
   } catch {}
 
-  replyWithFollowButton(ctx, HELLO_MESSAGE + HELLO_INSTRUCTION_MESSAGE).catch(() => null)
+  replyWithFollowButton(ctx, HELLO_MESSAGE + HELLO_INSTRUCTION_MESSAGE).catch(noop)
 })
+
+const sendPromote = async (video: IPromoteVideo, url: string, text: string) => {
+  const users = getUsers()
+
+  const { source, ...meta } = video
+
+  let successCount = 0
+
+  for (const user of users) {
+    try {
+      await bot.telegram.sendVideo(
+        user.id,
+        { source },
+        { ...meta, caption: text, reply_markup: { inline_keyboard: [[Markup.button.url('Слушать', url)]] } }
+      )
+
+      successCount++
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  await bot.telegram.sendMessage(TELEGRAM_BOT_ADMIN_ID, `Сообщение отправлено ${successCount} из ${users.length} пользователям`)
+}
+
+bot.hears(/\/promote (.+)\s\|\s(.+)\s\|\s(.+)/, async (ctx) => {
+  ctx.replyWithChatAction('typing').catch(noop)
+
+  if (ctx.message.from.id !== TELEGRAM_BOT_ADMIN_ID) {
+    return ctx.replyWithSticker('CAACAgIAAxkBAAIBdWH7Fc1A-TcUnjT52BZQShjhD8d1AAJFAAN_J6wO6wcjwBMAAcZ8IwQ').catch(noop)
+  }
+
+  const [, spotifyUrl, url, text] = ctx.match
+
+  try {
+    const preview = await getPreview(spotifyUrl)
+
+    const video = await makePromoteVideo(preview)
+
+    sendPromote(video, url, text)
+  } catch (e) {
+    ctx.reply(String(e)).catch(noop)
+  }
+})
+
+bot.on('sticker', (ctx) => console.log(ctx.message.sticker))
 
 bot.on('text', async (ctx) => {
   try {
     const message = ctx.message
     const userId = message.from.id
 
-    ctx.replyWithChatAction('typing').catch(() => null)
+    ctx.replyWithChatAction('typing').catch(noop)
 
     console.log('new message:', message)
 
