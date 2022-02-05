@@ -53,7 +53,7 @@ const sendMedia = async (ctx: MessageContext, media: string[]) => {
 }
 
 const sendVideo = async (ctx: MessageContext, videoURL: string, extras?: ExtraVideo) => {
-  logger.info('sendVideo', videoURL, extras)
+  logger.info('send video', { videoURL, extras })
 
   ctx.reply(ctx.t('startSendingMessage')).catch(noop)
 
@@ -112,6 +112,8 @@ const processYoutubeLink = async (ctx: MessageContext, link: string) => {
 
   const { buffer, filename, duration } = await getYoutubeAudio(link, onProgress)
 
+  logger.info('send youtube audio', { link, filename, duration })
+
   await ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: ctx.caption })
 }
 
@@ -130,6 +132,8 @@ const processBeatstarsLink = async (ctx: MessageContext, link: string) => {
   }
 
   const { buffer, filename, duration } = await getBeatstarsAudio(link, onProgress)
+
+  logger.info('send Beatstars audio', { link, filename, duration })
 
   await ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: ctx.caption })
 }
