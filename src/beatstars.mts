@@ -68,8 +68,6 @@ const tryFindOnYouTube = async (title: string, duration: number) => {
 
     const diff = Math.abs(duration - itemDuration)
 
-    console.log('duration', duration, itemDuration, diff)
-
     if (diff > 1) {
       return null
     }

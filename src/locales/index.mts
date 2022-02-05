@@ -12,5 +12,4 @@ export const localeResources: Resource = {
   en: { translation: en },
 }
 
-export const initLocales = () =>
-  i18next.init({ debug: true, fallbackLng: 'en', cleanCode: true, resources: localeResources })
+export const initLocales = () => i18next.init({ fallbackLng: 'en', cleanCode: true, resources: localeResources })

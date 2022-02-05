@@ -1,10 +1,12 @@
-import { execFileSync, spawnSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import filenamify from 'filenamify'
 import ffmpeg from 'fluent-ffmpeg'
 import { Preview } from 'spotify-url-info'
 import Downloader from 'nodejs-file-downloader'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import cwebp from 'cwebp-bin'
+import { logger } from './logger.mjs'
 
 interface IGetAudioBufferParams {
   source: string
@@ -54,7 +56,7 @@ export const getAudio = async (params: IGetAudioBufferParams) => {
       })
       .on('error', (err) => reject(err))
       .on('stderr', (stderrLine) => {
-        console.log('Stderr output: ' + stderrLine)
+        logger.info('Stderr output: ' + stderrLine)
       })
       .pipe()
       .on('data', (chunk) => _buf.push(chunk))
@@ -104,7 +106,7 @@ export const makePromoteVideo = async (preview: Preview): Promise<IPromoteVideo>
         reject(err)
       })
       .on('stderr', (stderrLine) => {
-        console.log('Stderr output: ' + stderrLine)
+        logger.info('Stderr output: ' + stderrLine)
       })
       .on('end', () => {
         clearTimeout(timeoutId)

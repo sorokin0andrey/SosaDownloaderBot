@@ -1,0 +1,3 @@
+export const TELEGRAM_BOT_API_TOKEN = process.env.TELEGRAM_BOT_API_TOKEN
+export const TELEGRAM_BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME
+export const TELEGRAM_BOT_ADMIN_ID = Number(process.env.TELEGRAM_BOT_ADMIN_ID)

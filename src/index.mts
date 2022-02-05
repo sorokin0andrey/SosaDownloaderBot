@@ -4,23 +4,23 @@ import { Markup, Telegraf } from 'telegraf'
 import { ExtraVideo } from 'telegraf/typings/telegram-types'
 import { checkAlreadyFollowed, checkFollowing, checkStolenInstagram, getInstagramUsername } from './auth.mjs'
 import { getBeatstarsAudio, isBeatstarsLink } from './beatstars.mjs'
+import { TELEGRAM_BOT_ADMIN_ID, TELEGRAM_BOT_API_TOKEN, TELEGRAM_BOT_USERNAME } from './config.mjs'
 import { getUsers, initDB, saveUser } from './db.mjs'
 import { IPromoteVideo, makePromoteVideo } from './ffmpeg.mjs'
 import { getInstagramMediaByLink, isInstagramLink } from './instagram.mjs'
 import { initLocales } from './locales/index.mjs'
+import { logger } from './logger.mjs'
 import { getTikTokVideoURLByLink, isTikTokLink } from './tiktok.mjs'
 import { getTrillerVideoByLink, isTrillerLink } from './triller.mjs'
 import { BotContext, MessageContext } from './types.mjs'
 import { noop } from './utils.mjs'
 import { getYoutubeAudio, isYoutubeLink } from './youtube.mjs'
 
-const TELEGRAM_BOT_API_TOKEN = process.env.TELEGRAM_BOT_API_TOKEN
-const TELEGRAM_BOT_USERNAME = process.env.TELEGRAM_BOT_USERNAME
-const TELEGRAM_BOT_ADMIN_ID = Number(process.env.TELEGRAM_BOT_ADMIN_ID)
-
 const bot = new Telegraf<BotContext>(TELEGRAM_BOT_API_TOKEN)
 
 bot.use((ctx, next) => {
+  logger.info('message', ctx.message)
+
   const lng = ctx.from?.language_code || 'en'
 
   ctx.t = (key, options) => i18next.t(key, { lng, ...options })
@@ -37,7 +37,7 @@ const replyWithFollowButton = (ctx: MessageContext, message: string) =>
   )
 
 const sendMedia = async (ctx: MessageContext, media: string[]) => {
-  console.log('sendMedia', media)
+  logger.info('sendMedia', media)
 
   ctx.reply(ctx.t('startSendingMessage')).catch(noop)
 
@@ -53,7 +53,7 @@ const sendMedia = async (ctx: MessageContext, media: string[]) => {
 }
 
 const sendVideo = async (ctx: MessageContext, videoURL: string, extras?: ExtraVideo) => {
-  console.log('sendVideo', videoURL, extras)
+  logger.info('sendVideo', videoURL, extras)
 
   ctx.reply(ctx.t('startSendingMessage')).catch(noop)
 
@@ -227,7 +227,7 @@ const sendPromote = async (ctx: MessageContext, video: IPromoteVideo, url: strin
 
       successCount++
     } catch (e) {
-      console.log(e)
+      logger.error(e)
     }
   }
 
@@ -254,8 +254,6 @@ bot.hears(/\/promote (.+)\s\|\s(.+)\s\|\s(.+)/, async (ctx) => {
   }
 })
 
-bot.on('sticker', (ctx) => console.log(ctx.message.sticker))
-
 bot.on('text', async (ctx) => {
   try {
     const message = ctx.message
@@ -263,8 +261,6 @@ bot.on('text', async (ctx) => {
     const userLang = message.from.language_code
 
     ctx.replyWithChatAction('typing').catch(noop)
-
-    console.log('new message:', message)
 
     const alreadyFollowed = await checkAlreadyFollowed(userId, userLang)
 
@@ -275,7 +271,7 @@ bot.on('text', async (ctx) => {
 
     await downloaderFlow(ctx)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     ctx.reply(ctx.t('errorMessage'))
   }
 })
