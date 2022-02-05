@@ -1,0 +1,19 @@
+{
+  "caption": "Downloaded by @{{ botName }}",
+  "startSendingMessage": "I got it. Uploading 🚀",
+  "processingMessage": "Processing... {{ progress }}",
+
+  "helloMessage": "Hi 👋\n\nWith me you can download video from Triller / TikTok / Instagram without watermarks (logos) with the best quality 😊\n\nAlso, you can download mp3 from YouTube / BeatStars link 🤩",
+  "howToAuthMessage": "To start using the bot follow my instagram and then send me your instagram nickname to verify following 🙏",
+  "howToUseMessage": "Send me a link and I will send you the video without watermarks (logos) with the best quality 😉",
+  "helloInstructionMessage": "\n\n$t(howToAuthMessage)\nSo, you will support the developer who didn't sleep all night to create me 🐼",
+  "stolenMessage": "Sorry, but someone used this instagram before you 😱\n\nIf this is your instagram, message me: @the_cursedsoul\n\nIf this is not your instagram and you want to deceive me, then don't try 😢",
+  "successSubscriptionMessage": "Nice! Thanks for following me ❤️\n\n$t(howToUseMessage)",
+  "failedSubscriptionMessage": "⚠️ Subscription not found. $t(howToAuthMessage)",
+  "follow": "Follow",
+
+  "errorMessage": "Something went wrong... 😔 Try again 🙏 May be later ⏱",
+
+  "promotionSentMessage": "Message sent to {{ successCount }} of {{ totalCount }} users",
+  "promotionListen": "Listen"
+}

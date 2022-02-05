@@ -4,6 +4,7 @@ export interface IUser {
   id: number
   username?: string
   instagram: string
+  language: string
 }
 
 export interface IDatabaseData {
@@ -48,11 +49,10 @@ export const deleteUser = async (userId: number) => {
 
 export const getUsers = () => {
   const users = db.data?.users || {}
-  
+
   return Object.values(users)
 }
 
 export const findUserByInstagram = (instagram: string): IUser | null => {
-
   return getUsers().find((user) => user.instagram === instagram) || null
 }

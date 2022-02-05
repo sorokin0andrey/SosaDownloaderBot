@@ -1,5 +1,5 @@
-import { deleteUser, findUser, findUserByInstagram } from "./db.mjs";
-import { getInstagramProfile, INSTAGRAM_URL_REGEX, isInstagramLink, isInstagramUsername } from "./instagram.mjs";
+import { deleteUser, findUser, findUserByInstagram, saveUser } from './db.mjs'
+import { getInstagramProfile, INSTAGRAM_URL_REGEX, isInstagramLink, isInstagramUsername } from './instagram.mjs'
 
 const MAGIC_INSTAGRAM_USERNAME = 'breakthefuckingrules'
 
@@ -9,17 +9,17 @@ export const checkFollowing = async (username: string) => {
   }
 
   try {
-    const instagramProfile = await getInstagramProfile(username);
+    const instagramProfile = await getInstagramProfile(username)
 
-    return Boolean(instagramProfile.follows_viewer);
+    return Boolean(instagramProfile.follows_viewer)
   } catch (e) {
-    console.log(e);
+    console.log(e)
 
-    return false;
+    return false
   }
-};
+}
 
-export const checkAlreadyFollowed = async (userId: number) => {
+export const checkAlreadyFollowed = async (userId: number, language: string = 'en') => {
   const user = findUser(userId)
 
   if (!user) {
@@ -32,18 +32,22 @@ export const checkAlreadyFollowed = async (userId: number) => {
     await deleteUser(userId)
   }
 
+  if (user.language !== language) {
+    await saveUser({ ...user, language })
+  }
+
   return following
-};
+}
 
 export const getInstagramUsername = (text: string) => {
   const isLink = isInstagramLink(text)
 
   if (isLink) {
     const match = text.match(INSTAGRAM_URL_REGEX)
-    
+
     return match?.[1] || null
   }
-  
+
   const isUsername = isInstagramUsername(text)
 
   return isUsername ? text : null
