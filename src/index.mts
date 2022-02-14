@@ -239,6 +239,24 @@ bot.command('start', async (ctx) => {
   replyWithFollowButton(ctx, ctx.t('helloMessage') + ctx.t('helloInstructionMessage')).catch(noop)
 })
 
+const sendUpdateMessage = async (ctx: MessageContext, message: string) => {
+  const users = getUsers()
+
+  let successCount = 0
+
+  for (const user of users) {
+    try {
+      await bot.telegram.sendMessage(user.id, message, { disable_notification: true })
+
+      successCount++
+    } catch (e) {
+      logger.error(e)
+    }
+  }
+
+  await ctx.reply(ctx.t('promotionSentMessage', { successCount, totalCount: users.length }))
+}
+
 const sendPromote = async (ctx: MessageContext, video: IPromoteVideo, url: string, text: string) => {
   const users = getUsers()
 
@@ -286,6 +304,20 @@ bot.hears(/\/promote (.+)\s\|\s(.+)\s\|\s(.+)/, async (ctx) => {
     sendPromote(ctx, video, url, text)
   } catch (e) {
     ctx.reply(String(e)).catch(noop)
+  }
+})
+
+bot.hears(/\/sendupdate (.+)/, async (ctx) => {
+  ctx.replyWithChatAction('typing').catch(noop)
+
+  if (ctx.message.from.id !== TELEGRAM_BOT_ADMIN_ID) {
+    return ctx.replyWithSticker('CAACAgIAAxkBAAIBdWH7Fc1A-TcUnjT52BZQShjhD8d1AAJFAAN_J6wO6wcjwBMAAcZ8IwQ').catch(noop)
+  }
+
+  const message = ctx.message.text.replace('/sendupdate ', '')
+
+  if (message && message.length) {
+    sendUpdateMessage(ctx, message)
   }
 })
 
