@@ -1,4 +1,5 @@
 import { execFileSync } from 'child_process'
+import { Worker } from 'worker_threads'
 import filenamify from 'filenamify'
 import ffmpeg from 'fluent-ffmpeg'
 import { Preview } from 'spotify-url-info'
@@ -7,6 +8,7 @@ import Downloader from 'nodejs-file-downloader'
 // @ts-ignore
 import cwebp from 'cwebp-bin'
 import { logger } from './logger.mjs'
+import { WorkerMessage } from './types.mjs'
 
 interface IGetAudioBufferParams {
   source: string
@@ -23,51 +25,29 @@ export interface IPromoteVideo {
   height: number
 }
 
-const timemarkToSeconds = (timemark: string) => {
-  const match = timemark.match(/(.*):(.*):(.*)/)
-
-  if (!match) {
-    return 0
-  }
-
-  const [hours, minutes, seconds] = [match[1], match[2], match[3]].map(Number)
-
-  const sum = hours * 3600 + minutes * 60 + seconds
-
-  return Math.ceil(sum)
-}
-
 export const getAudio = async (params: IGetAudioBufferParams) => {
   const { source, title, format = 'mp3', duration = 0, onProgress = () => null } = params
 
   const filename = `${filenamify(title)}.${format}`
 
   const buffer = await new Promise<Buffer>((resolve, reject) => {
-    const _buf: Uint8Array[] = []
+    const worker = new Worker('./build/workers/ffmpegWorker.mjs', { workerData: { source, format, duration } })
 
-    const timeoutId = setTimeout(() => reject(), 40000)
+    worker.on('error', reject)
 
-    ffmpeg(source)
-      .audioBitrate(320)
-      .toFormat(format)
-      .on('progress', (progress) => {
-        const ratio = Math.min(timemarkToSeconds(progress.timemark) / duration, 1)
-        onProgress(ratio)
-      })
-      .on('error', (err) => reject(err))
-      .on('stderr', (stderrLine) => {
-        logger.info('Stderr output: ' + stderrLine)
-      })
-      .pipe()
-      .on('data', (chunk) => _buf.push(chunk))
-      .on('end', () => {
-        clearTimeout(timeoutId)
-        resolve(Buffer.concat(_buf))
-      })
-      .on('error', (err) => {
-        clearTimeout(timeoutId)
-        reject(err)
-      })
+    worker.on('message', (message: WorkerMessage) => {
+      if (message.type === 'error') {
+        reject(message.error)
+      }
+
+      if (message.type === 'success') {
+        resolve(Buffer.concat(message.buffer))
+      }
+
+      if (message.type === 'progress') {
+        onProgress(message.progress)
+      }
+    })
   })
 
   if (buffer.length === 0) {

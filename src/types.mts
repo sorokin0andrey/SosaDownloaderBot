@@ -14,3 +14,8 @@ export type MatchedContext<C extends BotContext, T extends UpdateType | MessageS
 >
 
 export type MessageContext = MatchedContext<BotContext, 'text'>
+
+export type WorkerMessage =
+  | { type: 'progress'; progress: number }
+  | { type: 'success'; buffer: Uint8Array[] }
+  | { type: 'error'; error: string }

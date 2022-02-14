@@ -1,9 +1,11 @@
 import fetch from 'node-fetch'
+import { tall } from 'tall'
 import ytdl from 'ytdl-core'
 import ytsr from 'ytsr'
 import { getAudio } from './ffmpeg.mjs'
 
 const BEATSTARS_REGEX = /beatstars.com\/(.+)-([^/?]+)/
+const BEATSTARS_SHORT_REGEX = /bsta.rs\/([^/?]+)/
 
 const getFixedDuration = (input: string) => {
   const match = input.match(/(.*):(.*)/)
@@ -82,14 +84,16 @@ const tryFindOnYouTube = async (title: string, duration: number) => {
   return null
 }
 
-export const getBeatstarsId = (link: string) => {
-  const match = link.match(BEATSTARS_REGEX)
+const parseUrl = async (link: string) => {
+  const url = BEATSTARS_SHORT_REGEX.test(link) ? await tall(link) : link
+
+  const match = url.match(BEATSTARS_REGEX)
 
   return match?.[2] || null
 }
 
 export const getBeatstarsAudio = async (link: string, onProgress: (progress: number) => void) => {
-  const id = getBeatstarsId(link)
+  const id = await parseUrl(link)
 
   if (!id) {
     throw new Error('invalid link')
@@ -112,4 +116,4 @@ export const getBeatstarsAudio = async (link: string, onProgress: (progress: num
   return { info, buffer, filename, duration }
 }
 
-export const isBeatstarsLink = (link: string) => BEATSTARS_REGEX.test(link)
+export const isBeatstarsLink = (link: string) => BEATSTARS_REGEX.test(link) || BEATSTARS_SHORT_REGEX.test(link)

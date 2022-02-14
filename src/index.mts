@@ -18,6 +18,8 @@ import { getYoutubeAudio, isYoutubeLink } from './youtube.mjs'
 
 const bot = new Telegraf<BotContext>(TELEGRAM_BOT_API_TOKEN)
 
+const inProgressUsers = new Set<number>([])
+
 bot.use((ctx, next) => {
   logger.info('message', ctx.message)
 
@@ -29,6 +31,11 @@ bot.use((ctx, next) => {
 
   return next()
 })
+
+const replyError = (ctx: MessageContext, error: unknown) => {
+  console.log(error)
+  ctx.reply(ctx.t('errorMessage')).catch(noop)
+}
 
 const replyWithFollowButton = (ctx: MessageContext, message: string) =>
   ctx.reply(
@@ -97,6 +104,8 @@ const processInstagramLink = async (ctx: MessageContext, link: string) => {
 }
 
 const processYoutubeLink = async (ctx: MessageContext, link: string) => {
+  const userId = ctx.from.id
+
   const msg = await ctx.reply(ctx.t('processingMessage', { progress: '' }))
 
   const onProgress = (progress: number) => {
@@ -110,14 +119,23 @@ const processYoutubeLink = async (ctx: MessageContext, link: string) => {
       .catch(noop)
   }
 
-  const { buffer, filename, duration } = await getYoutubeAudio(link, onProgress)
+  inProgressUsers.add(userId)
 
-  logger.info('send youtube audio', { link, filename, duration })
+  getYoutubeAudio(link, onProgress)
+    .then(({ buffer, filename, duration }) => {
+      logger.info('send youtube audio', { link, filename, duration })
 
-  await ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: ctx.caption })
+      return ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: ctx.caption })
+    })
+    .catch((e) => replyError(ctx, e))
+    .finally(() => {
+      inProgressUsers.delete(userId)
+    })
 }
 
 const processBeatstarsLink = async (ctx: MessageContext, link: string) => {
+  const userId = ctx.from.id
+
   const msg = await ctx.reply(ctx.t('processingMessage', { progress: '' }))
 
   const onProgress = (progress: number) => {
@@ -131,11 +149,18 @@ const processBeatstarsLink = async (ctx: MessageContext, link: string) => {
       .catch(noop)
   }
 
-  const { buffer, filename, duration } = await getBeatstarsAudio(link, onProgress)
+  inProgressUsers.add(userId)
 
-  logger.info('send Beatstars audio', { link, filename, duration })
+  getBeatstarsAudio(link, onProgress)
+    .then(({ buffer, filename, duration }) => {
+      logger.info('send Beatstars audio', { link, filename, duration })
 
-  await ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: ctx.caption })
+      return ctx.replyWithAudio({ source: buffer, filename }, { duration, caption: ctx.caption })
+    })
+    .catch((e) => replyError(ctx, e))
+    .finally(() => {
+      inProgressUsers.delete(userId)
+    })
 }
 
 const unauthorizedFlow = async (ctx: MessageContext) => {
@@ -172,6 +197,12 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
 
 const downloaderFlow = (ctx: MessageContext) => {
   const text = ctx.message.text
+  const userId = ctx.from.id
+
+  if (inProgressUsers.has(userId)) {
+    ctx.reply(ctx.t('holdOnMessage')).catch(noop)
+    return
+  }
 
   if (isBeatstarsLink(text)) {
     return processBeatstarsLink(ctx, text)
@@ -193,7 +224,7 @@ const downloaderFlow = (ctx: MessageContext) => {
     return processInstagramLink(ctx, text)
   }
 
-  ctx.reply(ctx.t('howToUseMessage'))
+  ctx.reply(ctx.t('howToUseMessage')).catch(noop)
 }
 
 bot.command('start', async (ctx) => {
@@ -275,8 +306,7 @@ bot.on('text', async (ctx) => {
 
     await downloaderFlow(ctx)
   } catch (e) {
-    logger.error(e)
-    ctx.reply(ctx.t('errorMessage'))
+    replyError(ctx, e)
   }
 })
 

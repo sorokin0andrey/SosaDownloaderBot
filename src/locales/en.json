@@ -14,6 +14,8 @@
 
   "errorMessage": "Something went wrong... 😔 Try again 🙏 May be later ⏱",
 
+  "holdOnMessage": "Stay! not so fast! 🥺",
+
   "promotionSentMessage": "Message sent to {{ successCount }} of {{ totalCount }} users",
   "promotionListen": "Listen"
 }
