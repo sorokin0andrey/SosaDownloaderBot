@@ -26,7 +26,7 @@ const timemarkToSeconds = (timemark: string) => {
 new Promise<Uint8Array[]>((resolve, reject) => {
   const _buf: Uint8Array[] = []
 
-  const timeoutId = setTimeout(() => reject(), 40000)
+  const timeoutId = setTimeout(() => reject(), 60000)
 
   ffmpeg(source)
     .audioBitrate(320)

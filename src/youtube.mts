@@ -10,6 +10,10 @@ export const getYoutubeAudio = async (link: string, onProgress: (progress: numbe
 
   const duration = Number(info.videoDetails.lengthSeconds)
 
+  if (duration > 10 * 60) {
+    throw new Error(`video is too long (${duration} sec)`)
+  }
+
   const format = 'mp3'
 
   const { url } = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' })
