@@ -14,8 +14,8 @@ const checkin = async () => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0MzQzMjEzOCwiZXhwIjoxNjk1MjcyMTM4fQ.eyJpZCI6IjUyOTI2MjYwNiJ9.CPBagBAhTIMvXY5JLIxgdfscy7vlaf8FGyTT9S08v8I',
-      'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0NzgwNDQ0MiwiZXhwIjoxNjk5NjQ0NDQyfQ.eyJpZCI6IjUzNDI4MDU2NiIsInVzZXJfdXVpZCI6IjYzYmFmYzZmLWM1NWYtNDlmMC1iNWQzLWE4MTY4ZjZlOTkyNSJ9.cWumzziGOnE7aPyQyUPgkWYcLh1gXs3aL39ndzV_Lp0',
+      'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
       'sec-fetch-dest': 'empty',
@@ -34,8 +34,8 @@ const getUserId = async (username: string) => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0MzQzMjEzOCwiZXhwIjoxNjk1MjcyMTM4fQ.eyJpZCI6IjUyOTI2MjYwNiJ9.CPBagBAhTIMvXY5JLIxgdfscy7vlaf8FGyTT9S08v8I',
-      'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0NzgwNDQ0MiwiZXhwIjoxNjk5NjQ0NDQyfQ.eyJpZCI6IjUzNDI4MDU2NiIsInVzZXJfdXVpZCI6IjYzYmFmYzZmLWM1NWYtNDlmMC1iNWQzLWE4MTY4ZjZlOTkyNSJ9.cWumzziGOnE7aPyQyUPgkWYcLh1gXs3aL39ndzV_Lp0',
+      'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
       'sec-fetch-dest': 'empty',
@@ -58,8 +58,8 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0MzQzMjEzOCwiZXhwIjoxNjk1MjcyMTM4fQ.eyJpZCI6IjUyOTI2MjYwNiJ9.CPBagBAhTIMvXY5JLIxgdfscy7vlaf8FGyTT9S08v8I',
-      'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0NzgwNDQ0MiwiZXhwIjoxNjk5NjQ0NDQyfQ.eyJpZCI6IjUzNDI4MDU2NiIsInVzZXJfdXVpZCI6IjYzYmFmYzZmLWM1NWYtNDlmMC1iNWQzLWE4MTY4ZjZlOTkyNSJ9.cWumzziGOnE7aPyQyUPgkWYcLh1gXs3aL39ndzV_Lp0',
+      'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
       'sec-fetch-dest': 'empty',

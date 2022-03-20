@@ -54,5 +54,5 @@ export const getUsers = () => {
 }
 
 export const findUserByInstagram = (instagram: string): IUser | null => {
-  return getUsers().find((user) => user.instagram === instagram) || null
+  return getUsers().find((user) => user.instagram.toLowerCase() === instagram.toLowerCase()) || null
 }

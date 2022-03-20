@@ -20,7 +20,7 @@ export const checkFollowing = async (username: string) => {
   }
 }
 
-export const checkAlreadyFollowed = async (userId: number, language: string = 'en') => {
+export const checkAlreadyFollowed = async (userId: number, language = 'en') => {
   const user = findUser(userId)
 
   if (!user) {
@@ -46,12 +46,12 @@ export const getInstagramUsername = (text: string) => {
   if (isLink) {
     const match = text.match(INSTAGRAM_URL_REGEX)
 
-    return match?.[1] || null
+    return match?.[1]?.toLowerCase() || null
   }
 
   const isUsername = isInstagramUsername(text)
 
-  return isUsername ? text : null
+  return isUsername ? text.toLowerCase() : null
 }
 
 export const checkStolenInstagram = (userId: number, instagram: string) => {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { insta_post } from '@phaticusthiccy/open-apis'
 import fetch from 'node-fetch'
@@ -43,7 +44,7 @@ export const getInstagramProfile = async (username: string) => {
     method: 'GET',
   })
 
-  const data = (await response.json()) as any
+  const data = (await response.json()) as { graphql?: { user?: { id: string; follows_viewer: boolean } } }
 
   const user = data?.graphql?.user
 
@@ -51,5 +52,5 @@ export const getInstagramProfile = async (username: string) => {
     throw new Error('instagram_user_not_found')
   }
 
-  return user as { id: string; follows_viewer: boolean }
+  return user
 }
