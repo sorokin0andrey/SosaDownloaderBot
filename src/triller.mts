@@ -14,7 +14,7 @@ const checkin = async () => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0NzgwNDQ0MiwiZXhwIjoxNjk5NjQ0NDQyfQ.eyJpZCI6IjUzNDI4MDU2NiIsInVzZXJfdXVpZCI6IjYzYmFmYzZmLWM1NWYtNDlmMC1iNWQzLWE4MTY4ZjZlOTkyNSJ9.cWumzziGOnE7aPyQyUPgkWYcLh1gXs3aL39ndzV_Lp0',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0OTY5OTEzMSwiZXhwIjoxNzAxNTM5MTMxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.OU8BuUe36ZWYoKzRf4c_N5rdk7Y0mrMpsO3ns7CQC1s',
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -34,7 +34,7 @@ const getUserId = async (username: string) => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0NzgwNDQ0MiwiZXhwIjoxNjk5NjQ0NDQyfQ.eyJpZCI6IjUzNDI4MDU2NiIsInVzZXJfdXVpZCI6IjYzYmFmYzZmLWM1NWYtNDlmMC1iNWQzLWE4MTY4ZjZlOTkyNSJ9.cWumzziGOnE7aPyQyUPgkWYcLh1gXs3aL39ndzV_Lp0',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0OTY5OTEzMSwiZXhwIjoxNzAxNTM5MTMxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.OU8BuUe36ZWYoKzRf4c_N5rdk7Y0mrMpsO3ns7CQC1s',
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -58,7 +58,7 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0NzgwNDQ0MiwiZXhwIjoxNjk5NjQ0NDQyfQ.eyJpZCI6IjUzNDI4MDU2NiIsInVzZXJfdXVpZCI6IjYzYmFmYzZmLWM1NWYtNDlmMC1iNWQzLWE4MTY4ZjZlOTkyNSJ9.cWumzziGOnE7aPyQyUPgkWYcLh1gXs3aL39ndzV_Lp0',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0OTY5OTEzMSwiZXhwIjoxNzAxNTM5MTMxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.OU8BuUe36ZWYoKzRf4c_N5rdk7Y0mrMpsO3ns7CQC1s',
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
