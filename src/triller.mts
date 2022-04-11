@@ -1,5 +1,8 @@
 import fetch from 'node-fetch'
+import { SocksProxyAgent } from 'socks-proxy-agent'
 import { tall } from 'tall'
+
+const agent = new SocksProxyAgent('socks5h://127.0.0.1:9050')
 
 export interface ITrillerVideo {
   video_url: string
@@ -25,6 +28,7 @@ const checkin = async () => {
     referrerPolicy: 'same-origin',
     body: null,
     method: 'POST',
+    agent,
   })
 }
 
@@ -45,6 +49,7 @@ const getUserId = async (username: string) => {
     referrerPolicy: 'same-origin',
     body: null,
     method: 'GET',
+    agent,
   })
 
   const data = (await response.json()) as { user: { user_id: string } }
@@ -69,6 +74,7 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
     referrerPolicy: 'same-origin',
     body: null,
     method: 'GET',
+    agent,
   })
 
   const data = (await response.json()) as {
