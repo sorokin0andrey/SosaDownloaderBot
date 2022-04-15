@@ -49,7 +49,7 @@ const sendMedia = async (ctx: MessageContext, media: string[]) => {
   ctx.reply(ctx.t('startSendingMessage')).catch(noop)
 
   for (const url of media) {
-    ctx.replyWithChatAction('upload_document')
+    ctx.replyWithChatAction('upload_document').catch(noop)
 
     try {
       await ctx.replyWithDocument(url, {
@@ -170,7 +170,7 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
   const instagramUsername = getInstagramUsername(text)
 
   if (!instagramUsername) {
-    return replyWithFollowButton(ctx, ctx.t('howToAuthMessage')).catch(null)
+    return replyWithFollowButton(ctx, ctx.t('howToAuthMessage')).catch(noop)
   }
 
   const stolen = checkStolenInstagram(tgUser.id, instagramUsername)
@@ -182,7 +182,7 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
   const following = await checkFollowing(instagramUsername)
 
   if (!following) {
-    return replyWithFollowButton(ctx, ctx.t('failedSubscriptionMessage')).catch(null)
+    return replyWithFollowButton(ctx, ctx.t('failedSubscriptionMessage')).catch(noop)
   }
 
   await saveUser({
@@ -192,7 +192,7 @@ const unauthorizedFlow = async (ctx: MessageContext) => {
     language: tgUser.language_code || 'en',
   })
 
-  ctx.reply(ctx.t('successSubscriptionMessage')).catch(null)
+  ctx.reply(ctx.t('successSubscriptionMessage')).catch(noop)
 }
 
 const downloaderFlow = (ctx: MessageContext) => {
