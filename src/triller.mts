@@ -1,6 +1,5 @@
 import fetch from 'node-fetch'
 import { SocksProxyAgent } from 'socks-proxy-agent'
-import { tall } from 'tall'
 
 const agent = new SocksProxyAgent('socks5h://127.0.0.1:9050')
 
@@ -85,7 +84,7 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
 }
 
 const parseUrl = async (url: string) => {
-  const unshortenedUrl = await tall(url)
+  const { url: unshortenedUrl } = await fetch(url, { agent })
 
   const data = unshortenedUrl.match('https://triller.co/@([^/]+)/video/([^/]+)')
 
