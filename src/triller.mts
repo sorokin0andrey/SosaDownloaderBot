@@ -16,7 +16,7 @@ const checkin = async () => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0OTY5OTEzMSwiZXhwIjoxNzAxNTM5MTMxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.OU8BuUe36ZWYoKzRf4c_N5rdk7Y0mrMpsO3ns7CQC1s',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY1NDc3NjM5MywiZXhwIjoxNzA2NjE2MzkzfQ.eyJpZCI6IjU0MzE2NDM4MiIsInVzZXJfdXVpZCI6Ijk3ZGYzNzhhLWRjMGUtNGRhMS1iODc5LTM3MTBlZTZmNjIwZSJ9.uvuCSMDdALXWGg7mjQrcUzq5Bn-9zaEHl0nNA2NxaCc',
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -37,7 +37,7 @@ const getUserId = async (username: string) => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0OTY5OTEzMSwiZXhwIjoxNzAxNTM5MTMxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.OU8BuUe36ZWYoKzRf4c_N5rdk7Y0mrMpsO3ns7CQC1s',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY1NDc3NjM5MywiZXhwIjoxNzA2NjE2MzkzfQ.eyJpZCI6IjU0MzE2NDM4MiIsInVzZXJfdXVpZCI6Ijk3ZGYzNzhhLWRjMGUtNGRhMS1iODc5LTM3MTBlZTZmNjIwZSJ9.uvuCSMDdALXWGg7mjQrcUzq5Bn-9zaEHl0nNA2NxaCc',
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -62,7 +62,7 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
       authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY0OTY5OTEzMSwiZXhwIjoxNzAxNTM5MTMxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.OU8BuUe36ZWYoKzRf4c_N5rdk7Y0mrMpsO3ns7CQC1s',
+        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY1NDc3NjM5MywiZXhwIjoxNzA2NjE2MzkzfQ.eyJpZCI6IjU0MzE2NDM4MiIsInVzZXJfdXVpZCI6Ijk3ZGYzNzhhLWRjMGUtNGRhMS1iODc5LTM3MTBlZTZmNjIwZSJ9.uvuCSMDdALXWGg7mjQrcUzq5Bn-9zaEHl0nNA2NxaCc',
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -101,7 +101,7 @@ const parseUrl = async (url: string) => {
 export const getTrillerVideoByLink = async (link: string) => {
   const { username, videoUUID } = await parseUrl(link)
 
-  await checkin()
+  // await checkin()
 
   const userId = await getUserId(username)
 
