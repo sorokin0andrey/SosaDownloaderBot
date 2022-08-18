@@ -3,6 +3,13 @@ import { SocksProxyAgent } from 'socks-proxy-agent'
 
 const agent = new SocksProxyAgent('socks5h://127.0.0.1:9050')
 
+let token =
+  'eyJhbGciOiJIUzI1NiIsImlhdCI6MTY2MDg0NjA3MSwiZXhwIjoxNzEyNjg2MDcxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.vmPDvwr-6OJHYf5G3YPxR1gciZboE6NDZTot1oAi5Xk'
+
+export const setTrillerToken = (t: string) => {
+  token = t
+}
+
 export interface ITrillerVideo {
   video_url: string
   video_uuid: string
@@ -11,12 +18,11 @@ export interface ITrillerVideo {
 }
 
 const checkin = async () => {
-  await fetch('https://social.triller.co/v1.5/user/checkin', {
+  const response = await fetch('https://social.triller.co/v1.5/user/checkin', {
     headers: {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
-      authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY1NDc3NjM5MywiZXhwIjoxNzA2NjE2MzkzfQ.eyJpZCI6IjU0MzE2NDM4MiIsInVzZXJfdXVpZCI6Ijk3ZGYzNzhhLWRjMGUtNGRhMS1iODc5LTM3MTBlZTZmNjIwZSJ9.uvuCSMDdALXWGg7mjQrcUzq5Bn-9zaEHl0nNA2NxaCc',
+      authorization: `Bearer ${token}`,
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -29,6 +35,12 @@ const checkin = async () => {
     method: 'POST',
     agent,
   })
+
+  const data = (await response.json()) as { auth_token: string }
+
+  if (data?.auth_token) {
+    setTrillerToken(data.auth_token)
+  }
 }
 
 const getUserId = async (username: string) => {
@@ -36,8 +48,7 @@ const getUserId = async (username: string) => {
     headers: {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
-      authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY1NDc3NjM5MywiZXhwIjoxNzA2NjE2MzkzfQ.eyJpZCI6IjU0MzE2NDM4MiIsInVzZXJfdXVpZCI6Ijk3ZGYzNzhhLWRjMGUtNGRhMS1iODc5LTM3MTBlZTZmNjIwZSJ9.uvuCSMDdALXWGg7mjQrcUzq5Bn-9zaEHl0nNA2NxaCc',
+      authorization: `Bearer ${token}`,
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -61,8 +72,7 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
     headers: {
       accept: '*/*',
       'accept-language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7',
-      authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsImlhdCI6MTY1NDc3NjM5MywiZXhwIjoxNzA2NjE2MzkzfQ.eyJpZCI6IjU0MzE2NDM4MiIsInVzZXJfdXVpZCI6Ijk3ZGYzNzhhLWRjMGUtNGRhMS1iODc5LTM3MTBlZTZmNjIwZSJ9.uvuCSMDdALXWGg7mjQrcUzq5Bn-9zaEHl0nNA2NxaCc',
+      authorization: `Bearer ${token}`,
       'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="98", "Google Chrome";v="98"',
       'sec-ch-ua-mobile': '?0',
       'sec-ch-ua-platform': '"macOS"',
@@ -101,7 +111,7 @@ const parseUrl = async (url: string) => {
 export const getTrillerVideoByLink = async (link: string) => {
   const { username, videoUUID } = await parseUrl(link)
 
-  // await checkin()
+  await checkin()
 
   const userId = await getUserId(username)
 

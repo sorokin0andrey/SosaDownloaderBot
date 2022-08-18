@@ -11,7 +11,7 @@ import { getInstagramMediaByLink, isInstagramLink } from './instagram.mjs'
 import { initLocales } from './locales/index.mjs'
 import { logger } from './logger.mjs'
 import { getTikTokVideoURLByLink, isTikTokLink } from './tiktok.mjs'
-import { getTrillerVideoByLink, isTrillerLink } from './triller.mjs'
+import { getTrillerVideoByLink, isTrillerLink, setTrillerToken } from './triller.mjs'
 import { BotContext, MessageContext } from './types.mjs'
 import { noop } from './utils.mjs'
 import { getYoutubeAudio, isYoutubeLink } from './youtube.mjs'
@@ -286,6 +286,22 @@ const sendPromote = async (ctx: MessageContext, video: IPromoteVideo, url: strin
 
   await ctx.reply(ctx.t('promotionSentMessage', { successCount, totalCount: users.length }))
 }
+
+bot.hears(/\/triller_token (.+)/, async (ctx) => {
+  ctx.replyWithChatAction('typing').catch(noop)
+
+  if (ctx.message.from.id !== TELEGRAM_BOT_ADMIN_ID) {
+    return ctx.replyWithSticker('CAACAgIAAxkBAAIBdWH7Fc1A-TcUnjT52BZQShjhD8d1AAJFAAN_J6wO6wcjwBMAAcZ8IwQ').catch(noop)
+  }
+
+  const [, trillerToken] = ctx.match
+
+  console.log(trillerToken)
+
+  if (trillerToken.length > 0) {
+    setTrillerToken(trillerToken)
+  }
+})
 
 bot.hears(/\/promote (.+)\s\|\s(.+)\s\|\s(.+)/, async (ctx) => {
   ctx.replyWithChatAction('typing').catch(noop)
