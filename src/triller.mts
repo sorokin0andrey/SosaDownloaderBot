@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import { SocksProxyAgent } from 'socks-proxy-agent'
 
-const agent = new SocksProxyAgent('socks5h://127.0.0.1:9050')
+// const agent = new SocksProxyAgent('scks5h://127.0.0.1:9050')
 
 let token =
   'eyJhbGciOiJIUzI1NiIsImlhdCI6MTY2MDg0NjA3MSwiZXhwIjoxNzEyNjg2MDcxfQ.eyJpZCI6IjUyOTI2MjYwNiIsInVzZXJfdXVpZCI6ImQ1YzkzOWRiLWExMDYtNGI2MC04MTBhLTYxNjIzMDA3Njg3MSJ9.vmPDvwr-6OJHYf5G3YPxR1gciZboE6NDZTot1oAi5Xk'
@@ -59,7 +59,7 @@ const getUserId = async (username: string) => {
     referrerPolicy: 'same-origin',
     body: null,
     method: 'GET',
-    agent,
+    // agent,
   })
 
   const data = (await response.json()) as { user: { user_id: string } }
@@ -83,7 +83,7 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
     referrerPolicy: 'same-origin',
     body: null,
     method: 'GET',
-    agent,
+    // agent,
   })
 
   const data = (await response.json()) as {
@@ -94,7 +94,8 @@ const getVideos = async (userId: string): Promise<ITrillerVideo[]> => {
 }
 
 const parseUrl = async (url: string) => {
-  const { url: unshortenedUrl } = await fetch(url, { agent })
+  // const { url: unshortenedUrl } = await fetch(url, { agent })
+  const { url: unshortenedUrl } = await fetch(url)
 
   const data = unshortenedUrl.match('https://triller.co/@([^/]+)/video/([^/]+)')
 
