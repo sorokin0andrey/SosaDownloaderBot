@@ -1,7 +1,7 @@
 import i18next, { Resource } from 'i18next'
 
-import ru from './ru.json'
-import en from './en.json'
+import ru from './ru.json' assert { type: 'json' }
+import en from './en.json' assert { type: 'json' }
 
 export type LocaleKeys = keyof typeof ru
 
