@@ -33,7 +33,7 @@ const checkin = async () => {
     referrerPolicy: 'same-origin',
     body: null,
     method: 'POST',
-    agent,
+    // agent,
   })
 
   const data = (await response.json()) as { auth_token: string }
